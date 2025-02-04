@@ -40,20 +40,6 @@ def load_env_vars():
             raise EnvironmentError(f"Missing environment variable: {var}")
 
 
-async def check_api_availability():
-    """Проверяет доступность API при старте бота."""
-    test_url = API_URL_LIVE if not TEST else API_URL_SANDBOX
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(test_url) as response:
-                if response.status != 200:
-                    logger.warning(f"API is not available: {test_url}")
-                else:
-                    logger.info(f"API is available: {test_url}")
-    except Exception as e:
-        logger.error(f"Failed to check API availability: {e}")
-
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Отправляет сообщение с кнопками для выбора режима."""
     keyboard = [
@@ -86,7 +72,7 @@ async def send_api_request(url: str, data: Dict) -> Dict:
     try:
         async with aiohttp.ClientSession(
             trust_env=True,
-            connector=aiohttp.TCPConnector(ssl=ssl_context),
+            connector=aiohttp.TCPConnector(ssl=ssl_context, verify_ssl=False),
             timeout=ClientTimeout(total=5),
         ) as session:
             async with session.post(
@@ -114,7 +100,6 @@ async def process_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     api_url = API_URL_LIVE if selected_mode == MODE_LIVE else API_URL_SANDBOX
     response_data = await send_api_request(api_url, {"imei": user_input})
 
-    # Форматируем JSON-ответ
     formatted_response = json.dumps(response_data, indent=4, ensure_ascii=False)
     if len(formatted_response) > 4096:
         chunks = [
@@ -146,8 +131,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 
 def main() -> None:
     """Запускает телеграм-бота."""
-    load_env_vars()  # Проверяем переменные окружения
-    asyncio.run(check_api_availability())  # Проверяем доступность API
+    load_env_vars()  
 
     application = (
         Application.builder()
