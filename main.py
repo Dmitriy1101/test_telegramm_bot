@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 MODE_LIVE = "live"
 MODE_SANDBOX = "sandbox"
 
-BASE_API = f"http://{os.environ.get('API_HOST')}:{os.environ.get('API_PORT')}"
-API_URL_LIVE = f"{BASE_API}/api/check-imei"
-API_URL_SANDBOX = f"{BASE_API}/api/check-imei-sandbox"
+BASE_API = f"http://{os.environ.get('API_HOST')}:{os.environ.get('API_PORT')}/api/"
+API_URL_LIVE = f"{BASE_API}check-imei"
+API_URL_SANDBOX = f"{BASE_API}check-imei-sandbox"
 
 TOKEN = os.environ.get("API_TOKEN")
 TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -75,7 +75,7 @@ async def send_api_request(url: str, data: Dict) -> Dict:
             connector=aiohttp.TCPConnector(ssl=None), timeout=ClientTimeout(total=5)
         ) as session:
             async with session.post(
-                url, headers={"token": TOKEN}, json=data
+                url, headers={"token": TOKEN}, params=data
             ) as response:
                 if response.status == 200:
                     return await response.json()
