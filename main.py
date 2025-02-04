@@ -97,11 +97,11 @@ async def process_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     api_url = API_URL_LIVE if selected_mode == MODE_LIVE else API_URL_SANDBOX
     response_data = await send_api_request(api_url, {"imei": user_input})
-    for d in response_data:
+    for d in response_data.get("data"):
         formatted_response = json.dumps(d, indent=4, ensure_ascii=False)
         await update.message.reply_text(
-                    f"Ответ от API:\n<code>{formatted_response}</code>", parse_mode="HTML"
-                )
+            f"Ответ от API:\n<code>{formatted_response}</code>", parse_mode="HTML"
+        )
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
