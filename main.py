@@ -61,7 +61,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def send_api_request(url: str, data: Dict) -> Dict:
     """Отправляет POST-запрос на API и возвращает ответ."""
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(trust_env=True) as session:
         async with session.post(
             url, headers={"token": TOKEN}, params=data
         ) as response:
