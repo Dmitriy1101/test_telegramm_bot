@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 MODE_LIVE = "live"
 MODE_SANDBOX = "sandbox"
-BASE_API = f"https://{os.environ.get('API_HOST')}:{os.environ.get('API_PORT')}"
+BASE_API = f"http://{os.environ.get('API_HOST')}:{os.environ.get('API_PORT')}"
 API_URL_LIVE = f"{BASE_API}/api/check-imei"
 API_URL_SANDBOX = f"{BASE_API}/check-imei-sandbox"
 TOKEN = os.environ.get("API_TOKEN")
