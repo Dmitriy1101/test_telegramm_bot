@@ -25,7 +25,7 @@ MODE_SANDBOX = "sandbox"
 
 BASE_API = f"http://{os.environ.get('API_HOST')}:{os.environ.get('API_PORT')}"
 API_URL_LIVE = f"{BASE_API}/api/check-imei"
-API_URL_SANDBOX = f"{BASE_API}/check-imei-sandbox"
+API_URL_SANDBOX = f"{BASE_API}/api/check-imei-sandbox"
 
 TOKEN = os.environ.get("API_TOKEN")
 TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")
