@@ -67,18 +67,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def send_api_request(url: str, data: Dict) -> Dict:
     """Отправляет POST-запрос на API и возвращает ответ."""
+
     ssl_context = False if TEST else None
     logger.info(f"Sending API request to {url} with data: {data}")
     try:
         async with aiohttp.ClientSession(
-            trust_env=True,
-            connector=aiohttp.TCPConnector(ssl=ssl_context, verify_ssl=False),
-            timeout=ClientTimeout(total=5),
+            connector=aiohttp.TCPConnector(ssl=None), timeout=ClientTimeout(total=5)
         ) as session:
             async with session.post(
                 url, headers={"token": TOKEN}, json=data
             ) as response:
-                logger.info(f"Received API response with status: {response.status}")
                 if response.status == 200:
                     return await response.json()
                 else:
@@ -131,7 +129,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 
 def main() -> None:
     """Запускает телеграм-бота."""
-    load_env_vars()  
+    load_env_vars()
 
     application = (
         Application.builder()
