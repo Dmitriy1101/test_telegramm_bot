@@ -4,6 +4,7 @@ import logging
 from typing import Dict
 
 import aiohttp
+from aiohttp import ClientTimeout
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -26,6 +27,7 @@ API_URL_LIVE = f"{BASE_API}/api/check-imei"
 API_URL_SANDBOX = f"{BASE_API}/check-imei-sandbox"
 TOKEN = os.environ.get("API_TOKEN")
 TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TOKEN")
+TEST = os.environ.get("TEST") == "True"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -61,10 +63,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def send_api_request(url: str, data: Dict) -> Dict:
     """Отправляет POST-запрос на API и возвращает ответ."""
 
-    async with aiohttp.ClientSession(trust_env=True) as session:
-        async with session.post(
-            url, headers={"token": TOKEN}, params=data
-        ) as response:
+    connector = aiohttp.TCPConnector(ssl=TEST)
+    async with aiohttp.ClientSession(
+        trust_env=True, connector=connector, timeout=ClientTimeout(total=5)
+    ) as session:
+        async with session.post(url, headers={"token": TOKEN}, params=data) as response:
             if response.status == 200:
                 return await response.json()
             else:
@@ -90,12 +93,12 @@ async def process_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         f"Ответ от API:\n<code>{formatted_response}</code>", parse_mode="HTML"
     )
 
+
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Логирует ошибки и отправляет сообщение об ошибке пользователю."""
 
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
     await update.message.reply_text("Произошла ошибка. Попробуйте снова.")
-
 
 
 def main() -> None:

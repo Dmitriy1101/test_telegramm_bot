@@ -7,4 +7,5 @@ API_HOST='хост api'
 API_PORT='порт api'
 API_TOKEN='токен api'
 BOT_TOKEN='токен бота'
+TEST='True если тестируем иначе False'
 ```
